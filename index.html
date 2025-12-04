@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker - Full UI</title>
+    <title>Expense Tracker - Full App</title>
     <!-- Import Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Import FontAwesome for Icons -->
+    <!-- Import FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -22,6 +22,7 @@
             --selected-bg: #3b3f58;
             --week-bg: #f5f6fa;
             --week-active-bg: #fff0f0;
+            --calc-op-bg: #f4f6f9;
         }
 
         * {
@@ -29,6 +30,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -39,7 +41,6 @@
             min-height: 100vh;
         }
 
-        /* Mobile Container Simulation */
         .app-container {
             width: 100%;
             max-width: 375px;
@@ -52,162 +53,52 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* --- Header Section --- */
-        header {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
+        /* --- Header --- */
+        header { background-color: var(--white); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .header-title { font-weight: 700; font-size: 1.1rem; color: var(--text-dark); }
+        .top-icons i { margin-left: 15px; font-size: 1.1rem; color: #555; }
 
-        /* Top Bar */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-        }
+        .date-nav { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 15px 20px; font-weight: 500; }
+        .date-nav i { color: #555; cursor: pointer; }
 
-        .header-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-dark);
-        }
+        .tabs { display: flex; justify-content: space-between; padding: 0 10px; border-bottom: 1px solid var(--border-color); }
+        .tab { padding: 10px 5px; font-size: 0.9rem; color: var(--text-light); text-decoration: none; position: relative; cursor: pointer; }
+        .tab.active { color: var(--text-dark); font-weight: 500; }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--primary-red); }
 
-        .top-icons i {
-            margin-left: 15px;
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        /* Date Nav */
-        .date-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 20px 15px 20px;
-            font-weight: 500;
-        }
-
-        .date-nav i {
-            color: #555;
-            cursor: pointer;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab {
-            padding: 10px 5px;
-            font-size: 0.9rem;
-            color: var(--text-light);
-            text-decoration: none;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .tab.active {
-            color: var(--text-dark);
-            font-weight: 500;
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary-red);
-        }
-
-        /* Summary Bar */
-        .summary-bar {
-            display: flex;
-            background-color: var(--white);
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
-        .summary-item {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .summary-label {
-            font-size: 0.75rem;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .summary-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
+        /* --- Summary --- */
+        .summary-bar { display: flex; background-color: var(--white); padding: 10px 0; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .summary-item { flex: 1; text-align: center; display: flex; flex-direction: column; }
+        .summary-label { font-size: 0.75rem; color: #666; margin-bottom: 4px; }
+        .summary-value { font-size: 0.95rem; font-weight: 500; }
         .val-income { color: var(--primary-blue); }
         .val-exp { color: var(--primary-red); }
         .val-total { color: var(--text-dark); }
 
-        /* --- VIEW 1: Daily Content (Empty State) --- */
+        /* --- VIEW: Daily (Empty State) --- */
         #view-daily {
             flex: 1;
-            display: flex; /* Flex by default */
+            display: none; /* Controlled by JS */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: #ccc;
         }
-
-        .cat-graphic {
-            font-size: 4rem;
-            position: relative;
-            margin-bottom: 15px;
-        }
-
+        .cat-graphic { font-size: 4rem; position: relative; margin-bottom: 15px; }
         .cat-graphic .fa-cat { color: #ddd; }
-        .cat-graphic .fa-comment-dots {
-            position: absolute;
-            top: 0;
-            right: -15px;
-            font-size: 1.5rem;
-            color: #ddd;
-        }
+        .cat-graphic .fa-comment-dots { position: absolute; top: 0; right: -15px; font-size: 1.5rem; color: #ddd; }
+        .empty-text { font-size: 0.9rem; color: #bbb; }
 
-        .empty-text {
-            font-size: 0.9rem;
-            color: #bbb;
-        }
-
-        /* --- VIEW 2: Calendar Content --- */
+        /* --- VIEW: Calendar --- */
         #view-calendar {
             flex: 1;
-            display: none;
+            display: none; /* Controlled by JS */
             flex-direction: column;
             overflow: hidden;
         }
-
-        .week-header {
-            display: flex;
-            background-color: #fdfdfd;
-            border-bottom: 1px solid var(--border-color);
-            padding: 5px 0;
-        }
-
-        .day-label {
-            flex: 1;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #888;
-        }
-
+        .week-header { display: flex; background-color: #fdfdfd; border-bottom: 1px solid var(--border-color); padding: 5px 0; }
+        .day-label { flex: 1; text-align: center; font-size: 0.7rem; color: #888; }
         .day-label.sun { color: var(--primary-red); }
         .day-label.sat { color: var(--primary-blue); }
 
@@ -218,7 +109,6 @@
             grid-template-rows: repeat(6, 1fr);
             overflow-y: auto;
         }
-
         .cal-cell {
             border-right: 1px solid var(--cell-border);
             border-bottom: 1px solid var(--cell-border);
@@ -229,152 +119,219 @@
             display: flex;
             flex-direction: column;
         }
-
         .cal-cell:nth-child(7n) { border-right: none; }
         .cal-cell.sun { color: var(--primary-red); }
         .cal-cell.sat { color: var(--primary-blue); }
+        .cal-cell.other-month { color: #bbb; background-color: #fafafa; }
+        .cal-cell.selected { background-color: var(--selected-bg); color: white !important; }
 
-        .cal-cell.other-month {
-            color: #bbb;
-            background-color: #fafafa;
-        }
-
-        .cal-cell.selected {
-            background-color: var(--selected-bg);
-            color: white !important;
-        }
-
-        /* --- VIEW 3: Monthly Content --- */
+        /* --- VIEW: Monthly --- */
         #view-monthly {
             flex: 1;
-            display: none;
+            display: flex; /* Default */
             flex-direction: column;
             overflow-y: auto;
             background-color: var(--white);
         }
+        .month-row { padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; }
+        .month-info, .week-info { display: flex; flex-direction: column; }
+        .month-name { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px; }
+        .month-date, .week-date, .total-line { font-size: 0.75rem; color: var(--text-light); }
+        .month-stats, .week-stats { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-line { display: flex; gap: 15px; font-size: 0.85rem; margin-bottom: 4px; }
 
-        .month-row {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+        .week-container { background-color: var(--week-bg); }
+        .week-row { padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .week-row.active { background-color: var(--week-active-bg); }
+        .week-name { font-size: 0.85rem; color: var(--text-dark); font-weight: 500; }
 
-        .month-info, .week-info {
-            display: flex;
+        /* --- FAB --- */
+        .fab { position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px; background-color: var(--primary-red); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(255, 94, 87, 0.4); cursor: pointer; border: none; z-index: 10; }
+
+        /* --- Bottom Nav --- */
+        .bottom-nav { background-color: var(--white); height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; flex-shrink: 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-light); font-size: 0.7rem; cursor: pointer; }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary-red); }
+        .nav-item .fa-book { font-weight: 400; }
+
+        /* ========================================= */
+        /* === ADD TRANSACTION OVERLAY STYLES    === */
+        /* ========================================= */
+
+        #add-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 100;
+            display: none;
             flex-direction: column;
         }
 
-        .month-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .month-date, .week-date {
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        .month-stats, .week-stats {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .stat-line {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-        }
-
-        .total-line {
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        /* Styling for the expanded weeks */
-        .week-container {
-            background-color: var(--week-bg);
-        }
-
-        .week-row {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
+        .add-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 20px;
+            font-size: 1.0rem;
+            color: #333;
+        }
+        .header-left { display: flex; align-items: center; gap: 5px; font-weight: 500; cursor: pointer; }
+        .header-title-center { font-weight: 700; font-size: 1.1rem; }
+
+        .type-toggle-container {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .week-row.active {
-            background-color: var(--week-active-bg);
+        .type-btn {
+            flex: 1;
+            padding: 8px 0;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: #999;
+            background-color: #f5f5f5;
+            border: 1px solid transparent;
+            cursor: pointer;
         }
 
-        .week-name {
-            font-size: 0.85rem;
-            color: var(--text-dark);
-            font-weight: 500;
+        .type-btn.active-expense {
+            background-color: white;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
         }
 
-        /* --- Floating Action Button (FAB) --- */
-        .fab {
-            position: absolute;
-            bottom: 90px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background-color: var(--primary-red);
-            border-radius: 50%;
+        .form-container {
+            padding: 5px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row { display: flex; align-items: center; padding: 15px 0; }
+        .form-label { width: 80px; color: #aaa; font-size: 0.9rem; font-weight: 400; }
+
+        .form-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            min-height: 30px;
+        }
+        .amount-row .form-content { border-bottom: 2px solid var(--primary-red); }
+        .amount-input { border: none; outline: none; font-size: 1.1rem; width: 100%; }
+        .date-text { font-weight: 700; font-size: 1rem; color: #333; }
+
+        .rep-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+        }
+        .rep-icon-container i { font-size: 0.9rem; margin-bottom: 2px; }
+        .rep-icon-container span { font-size: 0.6rem; transform: scale(0.9); }
+
+        .exclamation-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 10px rgba(255, 94, 87, 0.4);
-            cursor: pointer;
-            border: none;
-            z-index: 10;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ccc;
         }
 
-        /* --- Bottom Navigation --- */
-        .bottom-nav {
-            background-color: var(--white);
-            height: 65px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #eee;
-            flex-shrink: 0;
-        }
-
-        .nav-item {
+        .calculator-container {
             display: flex;
             flex-direction: column;
+            background-color: var(--white);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .calc-header {
+            background-color: black;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            color: var(--text-light);
-            font-size: 0.7rem;
+            font-size: 0.9rem;
+        }
+        .calc-header-right { display: flex; gap: 20px; }
+        .calc-header-right i { cursor: pointer; }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 55px);
+        }
+
+        .calc-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #333;
+            background-color: #fff;
+            border-right: 1px solid #f2f2f2;
+            border-bottom: 1px solid #f2f2f2;
             cursor: pointer;
+            font-weight: 500;
         }
+        .calc-btn:active { background-color: #eee; }
+        .row-ops { background-color: var(--calc-op-bg); font-size: 1.2rem; font-weight: 400; }
+        .ok-btn { background-color: var(--primary-red) !important; color: white !important; font-size: 1rem !important; }
 
-        .nav-item i {
-            font-size: 1.4rem;
-            margin-bottom: 4px;
+        .backspace-icon {
+            border: 2px solid #555;
+            border-radius: 4px;
+            width: 24px;
+            height: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            color: #555;
         }
-
-        .nav-item.active {
-            color: var(--primary-red);
+        .backspace-icon::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 3px;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid #555;
         }
-
-        .nav-item .fa-book { font-weight: 400; }
+        .backspace-icon::after {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 3px;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid #fff;
+        }
+        .bs-x { font-size: 0.7rem; font-weight: bold; line-height: 0; }
+        .dot-btn { font-weight: bold; padding-bottom: 10px; }
 
     </style>
 </head>
 <body>
 
     <div class="app-container">
+
         <!-- Header -->
         <header>
             <div class="top-bar">
@@ -401,7 +358,7 @@
             </div>
         </header>
 
-        <!-- Summary Statistics -->
+        <!-- Summary -->
         <div class="summary-bar">
             <div class="summary-item">
                 <span class="summary-label">Income</span>
@@ -417,8 +374,8 @@
             </div>
         </div>
 
-        <!-- VIEW 1: Daily (Empty State) -->
-        <div id="view-daily" style="display: none;">
+        <!-- VIEW 1: Daily -->
+        <div id="view-daily">
             <div class="cat-graphic">
                 <i class="fa-solid fa-cat"></i>
                 <i class="fa-solid fa-comment-dots"></i>
@@ -437,250 +394,138 @@
                 <div class="day-label">Fri</div>
                 <div class="day-label sat">Sat</div>
             </div>
-
             <div class="calendar-grid">
-                <!-- Row 1 -->
-                <div class="cal-cell other-month sun">26</div>
-                <div class="cal-cell other-month">27</div>
-                <div class="cal-cell other-month">28</div>
-                <div class="cal-cell other-month">29</div>
-                <div class="cal-cell other-month">30</div>
-                <div class="cal-cell other-month">31</div>
-                <div class="cal-cell sat">01/11</div>
-                <!-- Row 2 -->
-                <div class="cal-cell sun">2</div>
-                <div class="cal-cell">3</div>
-                <div class="cal-cell">4</div>
-                <div class="cal-cell">5</div>
-                <div class="cal-cell">6</div>
-                <div class="cal-cell">7</div>
-                <div class="cal-cell sat">8</div>
-                <!-- Row 3 -->
-                <div class="cal-cell sun">9</div>
-                <div class="cal-cell">10</div>
-                <div class="cal-cell">11</div>
-                <div class="cal-cell">12</div>
-                <div class="cal-cell">13</div>
-                <div class="cal-cell">14</div>
-                <div class="cal-cell sat">15</div>
-                <!-- Row 4 -->
-                <div class="cal-cell sun">16</div>
-                <div class="cal-cell">17</div>
-                <div class="cal-cell">18</div>
-                <div class="cal-cell">19</div>
-                <div class="cal-cell">20</div>
-                <div class="cal-cell">21</div>
-                <div class="cal-cell sat">22</div>
-                <!-- Row 5 -->
-                <div class="cal-cell sun">23</div>
-                <div class="cal-cell">24</div>
-                <div class="cal-cell">25</div>
-                <div class="cal-cell">26</div>
-                <div class="cal-cell">27</div>
-                <div class="cal-cell selected">28</div>
-                <div class="cal-cell sat">29</div>
-                <!-- Row 6 -->
-                <div class="cal-cell sun">30</div>
-                <div class="cal-cell other-month">01/12</div>
-                <div class="cal-cell other-month">2</div>
-                <div class="cal-cell other-month">3</div>
-                <div class="cal-cell other-month">4</div>
-                <div class="cal-cell other-month">5</div>
-                <div class="cal-cell other-month sat">6</div>
+                <div class="cal-cell other-month sun">26</div><div class="cal-cell other-month">27</div><div class="cal-cell other-month">28</div><div class="cal-cell other-month">29</div><div class="cal-cell other-month">30</div><div class="cal-cell other-month">31</div><div class="cal-cell sat">01/11</div>
+                <div class="cal-cell sun">2</div><div class="cal-cell">3</div><div class="cal-cell">4</div><div class="cal-cell">5</div><div class="cal-cell">6</div><div class="cal-cell">7</div><div class="cal-cell sat">8</div>
+                <div class="cal-cell sun">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell">12</div><div class="cal-cell">13</div><div class="cal-cell">14</div><div class="cal-cell sat">15</div>
+                <div class="cal-cell sun">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div><div class="cal-cell">19</div><div class="cal-cell">20</div><div class="cal-cell">21</div><div class="cal-cell sat">22</div>
+                <div class="cal-cell sun">23</div><div class="cal-cell">24</div><div class="cal-cell">25</div><div class="cal-cell">26</div><div class="cal-cell">27</div><div class="cal-cell selected">28</div><div class="cal-cell sat">29</div>
+                <div class="cal-cell sun">30</div><div class="cal-cell other-month">01/12</div><div class="cal-cell other-month">2</div><div class="cal-cell other-month">3</div><div class="cal-cell other-month">4</div><div class="cal-cell other-month">5</div><div class="cal-cell other-month sat">6</div>
             </div>
         </div>
 
-        <!-- VIEW 3: Monthly List -->
-        <div id="view-monthly" style="display: flex;">
-            <!-- November (Expanded) -->
+        <!-- VIEW 3: Monthly -->
+        <div id="view-monthly">
             <div class="month-row">
-                <div class="month-info">
-                    <div class="month-name">Nov</div>
-                    <div class="month-date">01/11 - 30/11</div>
-                </div>
-                <div class="month-stats">
-                    <div class="stat-line">
-                        <span class="val-income">DH 0.00</span>
-                        <span class="val-exp">DH 0.00</span>
-                    </div>
-                    <div class="total-line">Total DH 0.00</div>
-                </div>
+                <div class="month-info"><div class="month-name">Nov</div><div class="month-date">01/11 - 30/11</div></div>
+                <div class="month-stats"><div class="stat-line"><span class="val-income">DH 0.00</span><span class="val-exp">DH 0.00</span></div><div class="total-line">Total DH 0.00</div></div>
             </div>
-            <!-- Expanded Weeks for November -->
             <div class="week-container">
-                <!-- Week 1 -->
-                <div class="week-row">
-                    <div class="week-info">
-                        <div class="week-name">30/11 - 06/12</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
-                </div>
-                <!-- Week 2 (Active/Selected) -->
                 <div class="week-row active">
-                    <div class="week-info">
-                        <div class="week-name">23/11 - 29/11</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
+                    <div class="week-info"><div class="week-name">23/11 - 29/11</div></div>
+                    <div class="week-stats"><div class="stat-line"><span class="val-income">DH 0.00</span><span class="val-exp">DH 0.00</span></div><div class="total-line">DH 0.00</div></div>
                 </div>
-                <!-- Week 3 -->
-                <div class="week-row">
-                    <div class="week-info">
-                        <div class="week-name">16/11 - 22/11</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
-                </div>
-                <!-- Week 4 -->
-                <div class="week-row">
-                    <div class="week-info">
-                        <div class="week-name">09/11 - 15/11</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
-                </div>
-                <!-- Week 5 -->
-                <div class="week-row">
-                    <div class="week-info">
-                        <div class="week-name">02/11 - 08/11</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
-                </div>
-                <!-- Week 6 -->
-                <div class="week-row">
-                    <div class="week-info">
-                        <div class="week-name">26/10 - 01/11</div>
-                    </div>
-                    <div class="week-stats">
-                        <div class="stat-line">
-                            <span class="val-income">DH 0.00</span>
-                            <span class="val-exp">DH 0.00</span>
-                        </div>
-                        <div class="total-line">DH 0.00</div>
-                    </div>
-                </div>
+                <div class="week-row"><div class="week-info"><div class="week-name">16/11 - 22/11</div></div><div class="week-stats"><div class="total-line">DH 0.00</div></div></div>
+                <div class="week-row"><div class="week-info"><div class="week-name">09/11 - 15/11</div></div><div class="week-stats"><div class="total-line">DH 0.00</div></div></div>
             </div>
-
-            <!-- October -->
             <div class="month-row">
-                <div class="month-info">
-                    <div class="month-name">Oct</div>
-                    <div class="month-date">01/10 - 31/10</div>
-                </div>
-                <div class="month-stats">
-                    <div class="stat-line">
-                        <span class="val-income">DH 0.00</span>
-                        <span class="val-exp">DH 0.00</span>
-                    </div>
-                    <div class="total-line">DH 0.00</div>
-                </div>
+                <div class="month-info"><div class="month-name">Oct</div><div class="month-date">01/10 - 31/10</div></div>
+                <div class="month-stats"><div class="total-line">DH 0.00</div></div>
             </div>
-
-            <!-- September -->
-            <div class="month-row">
-                <div class="month-info">
-                    <div class="month-name">Sep</div>
-                    <div class="month-date">01/09 - 30/09</div>
-                </div>
-                <div class="month-stats">
-                    <div class="stat-line">
-                        <span class="val-income">DH 0.00</span>
-                        <span class="val-exp">DH 0.00</span>
-                    </div>
-                    <div class="total-line">DH 0.00</div>
-                </div>
-            </div>
-
-             <!-- August -->
-             <div class="month-row">
-                <div class="month-info">
-                    <div class="month-name">Aug</div>
-                    <div class="month-date">01/08 - 31/08</div>
-                </div>
-                <div class="month-stats">
-                    <div class="stat-line">
-                        <span class="val-income">DH 0.00</span>
-                        <span class="val-exp">DH 0.00</span>
-                    </div>
-                    <div class="total-line">DH 0.00</div>
-                </div>
-            </div>
-
-            <!-- Padding for FAB -->
             <div style="height: 100px;"></div>
         </div>
 
-        <!-- Floating Action Button -->
-        <button class="fab">
+        <!-- FAB -->
+        <button class="fab" onclick="toggleAddScreen(true)">
             <i class="fa-solid fa-plus"></i>
         </button>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Nav -->
         <div class="bottom-nav">
-            <div class="nav-item active">
-                <i class="fa-solid fa-book-open"></i>
-                <span>28/11</span>
+            <div class="nav-item active"><i class="fa-solid fa-book-open"></i><span>28/11</span></div>
+            <div class="nav-item"><i class="fa-solid fa-chart-simple"></i><span>Stats</span></div>
+            <div class="nav-item"><i class="fa-solid fa-coins"></i><span>Accounts</span></div>
+            <div class="nav-item"><i class="fa-solid fa-ellipsis"></i><span>More</span></div>
+        </div>
+
+        <!-- OVERLAY -->
+        <div id="add-overlay">
+            <div class="add-header">
+                <div class="header-left" onclick="toggleAddScreen(false)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    <span>Trans.</span>
+                </div>
+                <div class="header-title-center">Expense</div>
+                <i class="fa-regular fa-star"></i>
             </div>
-            <div class="nav-item">
-                <i class="fa-solid fa-chart-simple"></i>
-                <span>Stats</span>
+            <div class="type-toggle-container">
+                <div class="type-btn">Income</div>
+                <div class="type-btn active-expense">Expense</div>
+                <div class="type-btn">Transfer</div>
             </div>
-            <div class="nav-item">
-                <i class="fa-solid fa-coins"></i>
-                <span>Accounts</span>
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-label">Date</div>
+                    <div class="form-content">
+                        <span class="date-text">Thu, 04/12/2025</span>
+                        <div class="rep-icon-container">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Rep/Inst.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row amount-row">
+                    <div class="form-label">Amount</div>
+                    <div class="form-content">
+                        <input type="text" class="amount-input" id="amount-display" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Category</div>
+                    <div class="form-content"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Account</div>
+                    <div class="form-content"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Note</div>
+                    <div class="form-content">
+                        <div></div>
+                        <div class="exclamation-box">!</div>
+                    </div>
+                </div>
             </div>
-            <div class="nav-item">
-                <i class="fa-solid fa-ellipsis"></i>
-                <span>More</span>
+            <div class="calculator-container">
+                <div class="calc-header">
+                    <span>Amount</span>
+                    <div class="calc-header-right">
+                        <i class="fa-solid fa-globe"></i>
+                        <i class="fa-solid fa-xmark" onclick="toggleAddScreen(false)"></i>
+                    </div>
+                </div>
+                <div class="calc-grid">
+                    <div class="calc-btn row-ops">+</div><div class="calc-btn row-ops">-</div><div class="calc-btn row-ops">×</div><div class="calc-btn row-ops">÷</div>
+                    <div class="calc-btn" onclick="pressKey('7')">7</div><div class="calc-btn" onclick="pressKey('8')">8</div><div class="calc-btn" onclick="pressKey('9')">9</div><div class="calc-btn">=</div>
+                    <div class="calc-btn" onclick="pressKey('4')">4</div><div class="calc-btn" onclick="pressKey('5')">5</div><div class="calc-btn" onclick="pressKey('6')">6</div><div class="calc-btn dot-btn" onclick="pressKey('.')">.</div>
+                    <div class="calc-btn" onclick="pressKey('1')">1</div><div class="calc-btn" onclick="pressKey('2')">2</div><div class="calc-btn" onclick="pressKey('3')">3</div>
+                    <div class="calc-btn" onclick="pressKey('back')"><div class="backspace-icon"><span class="bs-x">✕</span></div></div>
+                    <div class="calc-btn"></div><div class="calc-btn" onclick="pressKey('0')">0</div><div class="calc-btn"></div><div class="calc-btn ok-btn" onclick="toggleAddScreen(false)">OK</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Script to toggle tabs -->
+    <!-- Logic -->
     <script>
-        // Init with Monthly active to show latest request
+        // Start on Monthly
         switchTab('monthly');
 
         function switchTab(tabName) {
-            // Elements
+            // Tabs
             const dailyTab = document.getElementById('tab-daily');
             const calendarTab = document.getElementById('tab-calendar');
             const monthlyTab = document.getElementById('tab-monthly');
 
+            // Views
             const dailyView = document.getElementById('view-daily');
             const calendarView = document.getElementById('view-calendar');
             const monthlyView = document.getElementById('view-monthly');
 
+            // Date Label
             const dateDisplay = document.getElementById('date-display');
 
-            // Reset all
+            // Reset
             dailyTab.classList.remove('active');
             calendarTab.classList.remove('active');
             monthlyTab.classList.remove('active');
@@ -689,6 +534,7 @@
             calendarView.style.display = 'none';
             monthlyView.style.display = 'none';
 
+            // Activate
             if (tabName === 'daily') {
                 dailyTab.classList.add('active');
                 dailyView.style.display = 'flex';
@@ -700,8 +546,26 @@
             } else if (tabName === 'monthly') {
                 monthlyTab.classList.add('active');
                 monthlyView.style.display = 'flex';
-                // In monthly view, the header usually shows just the year
                 dateDisplay.textContent = "2025";
+            }
+        }
+
+        function toggleAddScreen(show) {
+            const overlay = document.getElementById('add-overlay');
+            if(show) {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+                document.getElementById('amount-display').value = "";
+            }
+        }
+
+        function pressKey(key) {
+            const display = document.getElementById('amount-display');
+            if(key === 'back') {
+                display.value = display.value.slice(0, -1);
+            } else {
+                display.value += key;
             }
         }
     </script>
